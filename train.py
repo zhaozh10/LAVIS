@@ -35,7 +35,7 @@ from lavis.tasks import *
 def parse_args():
     parser = argparse.ArgumentParser(description="Training")
 
-    parser.add_argument("--cfg-path", required=True, help="path to configuration file.")
+    parser.add_argument("--cfg-path", default="lavis/projects/blip2/train/pretrain_stage1_pmc.yaml", help="path to configuration file.")
     parser.add_argument(
         "--options",
         nargs="+",

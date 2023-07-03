@@ -5,9 +5,15 @@
 
 model:
   arch: blip2
-  model_type: pretrain
+  # model_type: pretrain
+  model_type: pretrain_vitL
   load_pretrained: False #pretrain from scratch
-  freeze_vit: True
+  pretrained: "../preTrain/blip2_pretrained_vitL.pth"
+  freeze_vit: False
+  num_query_token: 32
+  cross_attention_freq: 2
+  embed_dim: 256,
+  max_txt_len: 32
 
 datasets:
   # name of the dataset builder
@@ -30,7 +36,7 @@ run:
 
   weight_decay: 0.05
   max_epoch: 10
-  batch_size_train: 100
+  batch_size_train: 64
   batch_size_eval: 64
   num_workers: 4
   warmup_steps: 5000

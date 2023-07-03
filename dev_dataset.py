@@ -98,9 +98,7 @@ def main():
     # info=datasets['coco_caption']['train']
     # eval_info=datasets['coco_caption']['val']
     # test_info=datasets['coco_caption']['test']
-    res=info.__getitem__(index=0)
-    res=eval_info.__getitem__(index=0)
-    res=test_info.__getitem__(index=0)
+
     runner = get_runner_class(cfg)(
         cfg=cfg, job_id=job_id, task=task, model=model, datasets=datasets
     )

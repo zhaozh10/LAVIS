@@ -11,7 +11,10 @@ from lavis.datasets.datasets.coco_caption_datasets import (
     COCOCapEvalDataset,
     NoCapsEvalDataset,
 )
-
+from lavis.datasets.datasets.pmc_caption_dataset import (
+    PMCCaptionDataset,
+    PMCCapEvalDataset,
+)
 from lavis.common.registry import registry
 from lavis.datasets.datasets.video_caption_datasets import (
     VideoCaptionDataset,
@@ -27,6 +30,15 @@ class COCOCapBuilder(BaseDatasetBuilder):
     DATASET_CONFIG_DICT = {
         "default": "configs/datasets/coco/defaults_cap.yaml",
     }
+@registry.register_builder("pmc_caption")
+class PMCOABuilder(BaseDatasetBuilder):
+    train_dataset_cls = PMCCaptionDataset
+    eval_dataset_cls = PMCCapEvalDataset
+
+    DATASET_CONFIG_DICT = {
+        "default": "configs/datasets/pmc/defaults_cap.yaml",
+    }
+
 
 
 @registry.register_builder("nocaps")

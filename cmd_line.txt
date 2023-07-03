@@ -1,0 +1,3 @@
+ GPUS=4 GPUS_PER_NODE=4 CPUS_PER_TASK=2 run_scripts/blip2/train/slurm_stage1_pmc.sh bme_gpu blip2_stage1 lavis/projects/blip2/train/pretrain_stage1.yaml
+
+sbatch run_scripts/blip2/train/bme_stage1_pmc.sh lavis/projects/blip2/train/pretrain_stage1.yaml

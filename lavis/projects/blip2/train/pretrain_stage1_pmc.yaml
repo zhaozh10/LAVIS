@@ -51,6 +51,6 @@ run:
   train_splits: ["train"]
 
   device: "cuda"
-  world_size: 1
+  # world_size: 1
   dist_url: "env://"
   distributed: True

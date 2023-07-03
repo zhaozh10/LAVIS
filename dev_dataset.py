@@ -93,8 +93,9 @@ def main():
     datasets = task.build_datasets(cfg)
     model = task.build_model(cfg)
     info=datasets['pmc_caption']['train']
-    eval_info=datasets['pmc_caption']['val']
-    test_info=datasets['pmc_caption']['test']
+    # model(info[])
+    # eval_info=datasets['pmc_caption']['val']
+    # test_info=datasets['pmc_caption']['test']
     # info=datasets['coco_caption']['train']
     # eval_info=datasets['coco_caption']['val']
     # test_info=datasets['coco_caption']['test']

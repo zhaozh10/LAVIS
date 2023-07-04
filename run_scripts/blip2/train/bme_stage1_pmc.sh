@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 #SBATCH -p bme_gpu
+#SBATCH --nodelist=bme_gpu04
 #SBATCH --job-name=blip2_pmc
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:4

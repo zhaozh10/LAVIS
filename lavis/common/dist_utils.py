@@ -57,14 +57,13 @@ def infer_launcher():
     if 'WORLD_SIZE' in os.environ:
         return 'pytorch'
     elif 'SLURM_NTASKS' in os.environ:
-        print("hi, it's slurm!!!!")
         return 'slurm'
     elif 'OMPI_COMM_WORLD_LOCAL_RANK' in os.environ:
         return 'mpi'
     else:
         return 'none'
 
-def _init_dist_slurm(backend,
+def _init_dist_slurm(args, backend,
                      port=None,
                      init_backend='torch',
                      **kwargs) -> None:
@@ -81,6 +80,9 @@ def _init_dist_slurm(backend,
     proc_id = int(os.environ['SLURM_PROCID'])
     ntasks = int(os.environ['SLURM_NTASKS'])
     node_list = os.environ['SLURM_NODELIST']
+
+    args.rank = proc_id
+    args.gpu = args.rank % torch.cuda.device_count()
     # Not sure when this environment variable could be None, so use a fallback
     local_rank_env = os.environ.get('SLURM_LOCALID', None)
     if local_rank_env is not None:
@@ -131,9 +133,8 @@ def init_distributed_mode(args):
 
     args.distributed = True
     args.dist_backend = "nccl"
-
     if launcher == 'slurm':
-        _init_dist_slurm(args.dist_backend, init_backend='torch')
+        _init_dist_slurm(args=args,backend=args.dist_backend, init_backend='torch')
     else:
         print(
             "| distributed init (rank {}, world {}): {}".format(

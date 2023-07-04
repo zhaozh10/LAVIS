@@ -8,4 +8,5 @@ env:
   # cache_root: "cache"
   # For internal use with persistent storage
   # cache_root: "/export/home/.cache/lavis"
-  cache_root: "../data/"
+  # cache_root: "../data/"
+  cache_root: "/public_bme/data/"

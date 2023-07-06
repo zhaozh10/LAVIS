@@ -11,6 +11,7 @@ model:
   finetuned: ""
 
   # vit encoder
+  vit_model: "clip_L"
   image_size: 224
   drop_path_rate: 0
   use_grad_checkpoint: False

@@ -3,7 +3,7 @@
 # set -x
 source activate lavis
 
-nvidia-smi
+
 OUTPUT_FILE="job_$(date +"%Y%m%d_%H%M%S").out"
 PARTITION=$1
 JOB_NAME=$2
@@ -18,7 +18,6 @@ PYTHONPATH="$(dirname $0)/..":$PYTHONPATH \
 srun -p ${PARTITION} \
     --job-name=${JOB_NAME} \
     --mem 64G \
-    --nodelist bme_gpu04 \
     --gres=gpu:${GPUS_PER_NODE} \
     --ntasks=${GPUS} \
     --ntasks-per-node=${GPUS_PER_NODE} \

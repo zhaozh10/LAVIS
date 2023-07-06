@@ -11,4 +11,7 @@ Implementation:
 The "sbatch" command has an issue with DistributedDataParallel (DDP) not functioning correctly on our bme slurm cluster. Please use the second command instead.
 BLIP-2 stage 1:
 1) sbatch run_scripts/blip2/train/bme_stage1_pmc.sh lavis/projects/blip2/train/pretrain_stage1_pmc.yaml
-2) GPUS=4 GPUS_PER_NODE=4 CPUS_PER_TASK=2 run_scripts/blip2/train/slurm_stage1_pmc.sh bme_gpu blip2_stage1 lavis/projects/blip2/train/pretrain_stage1_pmc.yaml
+2) GPUS=4 GPUS_PER_NODE=4 CPUS_PER_TASK=2 run_scripts/blip2/train/slurm_pmc.sh bme_gpu blip2_stage1 lavis/projects/blip2/train/pretrain_stage1_pmc.yaml
+
+
+GPUS=4 GPUS_PER_NODE=4 CPUS_PER_TASK=2 run_scripts/blip2/train/slurm_pmc.sh bme_gpu blip2_stage2 lavis/projects/blip2/train/pretrain_stage2_pmc.yaml

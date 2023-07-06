@@ -363,6 +363,8 @@ class RunnerBase:
 
         # resume from checkpoint if specified
         if not self.evaluate_only and self.resume_ckpt_path is not None:
+            print(self.resume_ckpt_path)
+            print(os.getcwd())
             self._load_checkpoint(self.resume_ckpt_path)
 
         for cur_epoch in range(self.start_epoch, self.max_epoch):

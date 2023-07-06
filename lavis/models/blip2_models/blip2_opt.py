@@ -16,7 +16,22 @@ from lavis.models.blip2_models.blip2 import Blip2Base, disabled_train
 # from lavis.models.blip2_models.modeling_opt import OPTForCausalLM, OPTConfig
 from transformers import AutoTokenizer, OPTForCausalLM, OPTConfig
 import transformers
+from peft import LoraConfig, get_peft_model 
 
+
+def print_trainable_parameters(model):
+    """
+    Prints the number of trainable parameters in the model.
+    """
+    trainable_params = 0
+    all_param = 0
+    for _, param in model.named_parameters():
+        all_param += param.numel()
+        if param.requires_grad:
+            trainable_params += param.numel()
+    print(
+        f"trainable params: {trainable_params} || all params: {all_param} || trainable%: {100 * trainable_params / all_param}"
+    )
 
 @registry.register_model("blip2_opt")
 class Blip2OPT(Blip2Base):
@@ -51,6 +66,7 @@ class Blip2OPT(Blip2Base):
         opt_model="facebook/opt-2.7b",
         prompt="",
         max_txt_len=32,
+        peft=True,
         apply_lemmatizer=False,
     ):
         """
@@ -59,7 +75,7 @@ class Blip2OPT(Blip2Base):
         super().__init__()
         transformers_version = version.parse(transformers.__version__)
         assert transformers_version >= version.parse("4.27"), "BLIP-2 OPT requires transformers>=4.27"
-        
+        self.peft=peft
         self.tokenizer = self.init_tokenizer()
 
         self.visual_encoder, self.ln_vision = self.init_vision_encoder(
@@ -86,12 +102,23 @@ class Blip2OPT(Blip2Base):
         self.opt_model = OPTForCausalLM.from_pretrained(
             opt_model, torch_dtype=torch.float16
         )
+        config = LoraConfig(
+            r=16,
+            lora_alpha=32,
+            target_modules=["q_proj", "v_proj"],
+            lora_dropout=0.05,
+            bias="none",
+            task_type="CAUSAL_LM"
+        )
+
         for name, param in self.opt_model.named_parameters():
             param.requires_grad = False
         self.eos_token_id = self.opt_tokenizer(
             "\n", add_special_tokens=False
         ).input_ids[0]
-
+        if self.peft:
+            self.opt_model = get_peft_model(self.opt_model, config)
+            print_trainable_parameters(self.opt_model)
         self.opt_proj = nn.Linear(
             self.Qformer.config.hidden_size, self.opt_model.config.hidden_size
         )
@@ -145,8 +172,10 @@ class Blip2OPT(Blip2Base):
             torch.ones(atts_opt.size(), dtype=torch.long).to(image.device).fill_(-100)
         )
         targets = torch.cat([empty_targets, targets], dim=1)
-
-        inputs_embeds = self.opt_model.model.decoder.embed_tokens(opt_tokens.input_ids)
+        if self.peft:
+            inputs_embeds = self.opt_model.base_model.model.model.decoder.embed_tokens(opt_tokens.input_ids)
+        else:
+            inputs_embeds = self.opt_model.model.decoder.embed_tokens(opt_tokens.input_ids)
         inputs_embeds = torch.cat([inputs_opt, inputs_embeds], dim=1)
         attention_mask = torch.cat([atts_opt, opt_tokens.attention_mask], dim=1)
 

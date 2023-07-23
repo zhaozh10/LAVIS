@@ -334,6 +334,10 @@ class RunnerBase:
         return self.config.run_cfg.get("resume_ckpt_path", None)
 
     @property
+    def found_model(self):
+        return self.config.run_cfg.get("found_model", None)
+
+    @property
     def train_loader(self):
         train_dataloader = self.dataloaders["train"]
 
@@ -364,8 +368,10 @@ class RunnerBase:
         # resume from checkpoint if specified
         if not self.evaluate_only and self.resume_ckpt_path is not None:
             print(self.resume_ckpt_path)
+            print(self.found_model)
             print(os.getcwd())
-            self._load_checkpoint(self.resume_ckpt_path)
+            self._load_checkpoint(self.resume_ckpt_path, self.found_model)
+            print("loading complete!")
 
         for cur_epoch in range(self.start_epoch, self.max_epoch):
             # training phase
@@ -612,7 +618,7 @@ class RunnerBase:
             model.load_state_dict(checkpoint["model"], strict=False)
         return model
 
-    def _load_checkpoint(self, url_or_filename):
+    def _load_checkpoint(self, url_or_filename, found_model=None):
         """
         Resume from a checkpoint.
         """
@@ -622,12 +628,20 @@ class RunnerBase:
             )
             checkpoint = torch.load(cached_file, map_location=self.device)
         elif os.path.isfile(url_or_filename):
+            print("checkpoint!")
             checkpoint = torch.load(url_or_filename, map_location=self.device)
         else:
             raise RuntimeError("checkpoint url or path is invalid")
 
         state_dict = checkpoint["model"]
-        self.unwrap_dist_model(self.model).load_state_dict(state_dict)
+        print("state_dict!")
+        if found_model is not None:
+            print("loading weight ...... ")
+            found_weight=torch.load(found_model, map_location=self.device)
+            print("merging weight......")
+            logging.info("merging weight......")
+            state_dict.update(found_weight)
+        self.unwrap_dist_model(self.model).load_state_dict(state_dict,strict=False)
 
         self.optimizer.load_state_dict(checkpoint["optimizer"])
         if self.scaler and "scaler" in checkpoint:
